@@ -1,0 +1,14 @@
+<h1>Sunt in componenta Home</h1>
+<p>home works!</p>
+<p [style]="myStyle">{{ myVar }}</p>
+<button (click)="myVar = 'You clicked the button!'">Click me</button>
+<button (click)="myFunction()">Change style</button>
+
+
+<input type="text" [(ngModel)]="myVar" />
+
+<app-article 
+[parentColor]="parentColor" 
+[parentMessage]="parentMessage"
+(messageFromChild)="handleMessageFromChild($event)"
+    ></app-article>
