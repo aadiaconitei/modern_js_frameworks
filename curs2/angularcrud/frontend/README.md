@@ -123,8 +123,6 @@ Practic, `ProductFormComponent` este reutilizata in 3 moduri:
 - vizualizare
 - editare
 
-Aceasta este o decizie buna pentru un CRUD simplu, fiindca reduce duplicarea.
-
 ## 8. Conectarea componentelor in componenta radacina
 
 In `src/app/app.ts`, componenta principala importa:
@@ -139,15 +137,13 @@ Astfel, layout-ul general este compus din antet, continut de ruta si footer.
 
 Componenta `HomeComponent` este simpla si foloseste `RouterLink` pentru navigarea catre pagina de produse.
 
-Aceasta componenta a fost probabil generata cu comanda de mai sus, iar apoi completata manual in:
-
 - `src/app/pages/home/home.component.ts`
 - `src/app/pages/home/home.component.html`
 - `src/app/pages/home/home.component.css`
 
 ## 10. Implementarea listei de produse
 
-In `ProductsListComponent` s-au adaugat manual urmatoarele responsabilitati:
+In `ProductsListComponent` s-au adaugat urmatoarele responsabilitati:
 
 - incarcare produse la `ngOnInit()`
 - paginare cu `page` si `perPage`
