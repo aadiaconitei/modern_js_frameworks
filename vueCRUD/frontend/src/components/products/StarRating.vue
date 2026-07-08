@@ -56,3 +56,26 @@ function updateValue(value: number): void {
   emit("update:modelValue", value);
 }
 </script>
+<style scoped>
+.star-rating {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star-rating__star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.star-rating__star.is-filled {
+  color: rgb(45, 4, 193);
+}
+
+.star-rating__star.is-interactive:hover {
+  color: rgb(0, 255, 64);
+}
+</style>
