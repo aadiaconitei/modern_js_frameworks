@@ -212,7 +212,7 @@ Pe backend, expune static folderul uploads ca sa poti afisa poza din frontend.
 ### 15) Pornire backend
 
 ```bash
-cd angularCRUD/backend
+cd reactCRUD/backend
 npm run dev
 ```
 
@@ -244,3 +244,106 @@ curl -X POST http://localhost:3000/auth/login \
     "password":"parola123"
   }'
 ```
+
+## Continuare - Pagini noi Products si Users (doar dupa login)
+
+### 17) Creare fisiere noi in frontend
+
+```bash
+cd reactCRUD/frontend
+
+touch src/pages/Products.tsx
+touch src/pages/Users.tsx
+touch src/services/usersApi.ts
+```
+
+### 18) Endpoint backend pentru listarea utilizatorilor
+
+In `backend/server.js` adauga ruta protejata:
+
+- GET /users
+- foloseste middleware JWT (Authorization: Bearer TOKEN)
+- returneaza lista de utilizatori sanitizata (fara parola)
+
+Exemplu test rapid:
+
+```bash
+curl -X GET http://localhost:3000/users \
+  -H "Authorization: Bearer TOKEN_UL_TAU"
+```
+
+### 19) Service frontend pentru utilizatori
+
+In `src/services/usersApi.ts`:
+
+- configureaza axios cu `baseURL: http://localhost:3000/users`
+- trimite tokenul din `authStorage` in headerul Authorization
+- expune functia `getUsers()`
+
+### 20) Listare produse in pagina noua Products
+
+In `src/pages/Products.tsx`:
+
+- refoloseste structura din `ProductsListPage.tsx`
+- foloseste `getProducts`, paginare si afisare carduri
+- pastreaza actiunile Vizualizare, Editare, Stergere
+- la stergere foloseste `deleteProduct`
+
+Nota: pentru operatiile protejate (`POST/PUT/DELETE /clothes`), `productsApi.ts` trebuie sa trimita tokenul in headerul Authorization.
+
+### 21) Listare utilizatori in pagina Users
+
+In `src/pages/Users.tsx`:
+
+- apeleaza `getUsers()` la mount
+- afiseaza carduri cu: poza, nume, email, data crearii
+- trateaza loading + error state
+
+### 22) Rute protejate in frontend
+
+In `src/App.tsx`:
+
+- adauga un `ProtectedRoute` bazat pe `isAuthenticated` din `AuthContext`
+- adauga rutele:
+  - `/products` -> pagina `Products`
+  - `/users` -> pagina `Users`
+- protejeaza si rutele:
+  - `/products/new`
+  - `/products/:id`
+  - `/products/:id/edit`
+
+Daca userul nu este logat, redirect catre `/login`.
+
+### 23) Meniu vizibil doar dupa autentificare
+
+In `src/components/Header.tsx`:
+
+- afiseaza linkul `Produse` doar cand `isAuthenticated === true`
+- afiseaza linkul `Utilizatori` doar cand `isAuthenticated === true`
+
+Cand userul nu este logat, raman vizibile doar Home, Register si Login.
+
+### 24) Rulare si verificare
+
+```bash
+# terminal 1
+cd reactCRUD/backend
+node server.js
+
+# terminal 2
+cd reactCRUD/frontend
+npm run dev
+```
+
+Testeaza in browser:
+
+- http://localhost:5180/login
+- http://localhost:5180/products
+- http://localhost:5180/users
+
+Comportament asteptat:
+
+- fara login: `/products` si `/users` redirectioneaza la `/login`
+- dupa login: apar in meniu `Produse` si `Utilizatori`, iar paginile devin accesibile
+
+

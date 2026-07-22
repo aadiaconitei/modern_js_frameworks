@@ -17,7 +17,7 @@ function HomePage() {
           Frontend cu: React + Vite conectat la backendul Node.js. Poti vedea,
           crea, edita si sterge produse din catalog.
         </p>
-        <Link className="btn btn-primary btn-lg" to="/products">
+        <Link className="btn btn-primary btn-lg" to="/productsList">
           Mergi la produse
         </Link>
       </section>

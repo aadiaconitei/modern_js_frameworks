@@ -1,3 +1,5 @@
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
+
 const express = require("express");
 const fs = require("fs");
 const fsPromises = require("fs/promises");
@@ -16,6 +18,24 @@ const dbFilePath = path.join(__dirname, "db.json");
 const USERS_FILE = path.join(__dirname, "users.json");
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_change_me";
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Autentificare necesara." });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    return next();
+  } catch (_error) {
+    return res.status(401).json({ message: "Token invalid sau expirat." });
+  }
+}
 
 // Uploads configuration
 const UPLOADS_DIR = path.join(__dirname, "uploads", "users");
@@ -173,7 +193,7 @@ app.get("/clothes/:id", (req, res) => {
     "rating": 4
   }
 */
-app.post("/clothes", (req, res) => {
+app.post("/clothes", authenticateToken, (req, res) => {
   const { image, name, price, rating } = req.body;
 
   fs.readFile(dbFilePath, "utf8", (err, data) => {
@@ -222,7 +242,7 @@ app.post("/clothes", (req, res) => {
     "rating": 4
   }
 */
-app.put("/clothes/:id", (req, res) => {
+app.put("/clothes/:id", authenticateToken, (req, res) => {
   const id = parseInt(req.params.id);
   const { image, name, price, rating } = req.body;
 
@@ -264,7 +284,7 @@ app.put("/clothes/:id", (req, res) => {
 
 // DELETE route - Allows to delete an item
 // example: localhost:3000/clothes/1
-app.delete("/clothes/:id", (req, res) => {
+app.delete("/clothes/:id", authenticateToken, (req, res) => {
   const id = parseInt(req.params.id);
 
   fs.readFile(dbFilePath, "utf8", (err, data) => {
@@ -446,6 +466,111 @@ app.post("/auth/login", async (req, res) => {
     user: sanitizeUser(user),
   });
 });
+
+app.get("/users", authenticateToken, async (_req, res) => {
+  try {
+    const users = await readUsers();
+    return res.json(users.map(sanitizeUser));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Eroare interna de server." });
+  }
+});
+
+app.get("/users/:id", authenticateToken, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ message: "Id utilizator invalid." });
+    }
+
+    const users = await readUsers();
+    const user = users.find((item) => item.id === id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizatorul nu a fost gasit." });
+    }
+
+    return res.json(sanitizeUser(user));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Eroare interna de server." });
+  }
+});
+
+app.put("/users/:id", authenticateToken, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name, surname, email } = req.body;
+
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ message: "Id utilizator invalid." });
+    }
+
+    if (
+      !name ||
+      !surname ||
+      !email ||
+      typeof name !== "string" ||
+      typeof surname !== "string" ||
+      typeof email !== "string"
+    ) {
+      return res.status(400).json({ message: "Date invalide." });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const users = await readUsers();
+    const index = users.findIndex((item) => item.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Utilizatorul nu a fost gasit." });
+    }
+
+    const duplicatedEmail = users.find(
+      (item) => item.id !== id && item.email === normalizedEmail,
+    );
+    if (duplicatedEmail) {
+      return res.status(409).json({ message: "Exista deja un cont cu acest email." });
+    }
+
+    users[index] = {
+      ...users[index],
+      name: name.trim(),
+      surname: surname.trim(),
+      email: normalizedEmail,
+    };
+
+    await writeUsers(users);
+    return res.json(sanitizeUser(users[index]));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Eroare interna de server." });
+  }
+});
+
+app.delete("/users/:id", authenticateToken, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ message: "Id utilizator invalid." });
+    }
+
+    const users = await readUsers();
+    const index = users.findIndex((item) => item.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Utilizatorul nu a fost gasit." });
+    }
+
+    users.splice(index, 1);
+    await writeUsers(users);
+    return res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Eroare interna de server." });
+  }
+});
+
 // Test route to check if the server is running
 app.get("/auth/health", (_req, res) => {
   res.json({ status: "ok" });

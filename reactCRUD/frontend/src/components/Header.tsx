@@ -28,12 +28,22 @@ function Header() {
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/products">
-                Produse
-              </NavLink>
-            </li>
+                  <NavLink className="nav-link" to="/productsList">
+                    Produse
+                  </NavLink>
+                </li>
             {isAuthenticated ? (
               <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/adminProducts">
+                    Admin Produse
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/users">
+                    Admin Utilizatori
+                  </NavLink>
+                </li>
                 <li className="nav-item text-white d-flex align-items-center small px-2 gap-2">
                   {user?.photo ? (
                     <img

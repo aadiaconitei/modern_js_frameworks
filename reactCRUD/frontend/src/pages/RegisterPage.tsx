@@ -119,7 +119,7 @@ function RegisterPage() {
           </div>
         ) : null}
 
-        <form className="row g-3" onSubmit={handleSubmit}>
+        <form className="row g-3" onSubmit={handleSubmit} noValidate>
           <div className="col-12 col-md-6">
             <label htmlFor="name" className="form-label">
               Nume
