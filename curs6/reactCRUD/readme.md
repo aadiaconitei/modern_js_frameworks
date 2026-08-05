@@ -105,3 +105,142 @@ npm run build
 - /products/new -> creare produs
 - /products/:id -> vizualizare produs
 - /products/:id/edit -> editare produs
+
+# Continuare - Register si Login
+
+### 8) Frontend Register/Login - creare fisiere (pas cu pas)
+
+```bash
+cd reactCRUD/frontend
+
+mkdir -p src/context src/services src/pages
+
+touch src/context/AuthContext.tsx
+touch src/services/authApi.ts
+touch src/services/authStorage.ts
+touch src/pages/RegisterPage.tsx
+touch src/pages/LoginPage.tsx
+```
+
+### 9) Frontend Register/Login - integrare in aplicatie
+
+Actualizeaza fisierele de mai jos:
+
+- src/main.tsx
+  - importeaza AuthProvider
+  - inveleste <App /> in <AuthProvider>
+
+- src/App.tsx
+  - adauga rutele:
+    - /register
+    - /login
+
+- src/components/Header.tsx
+  - adauga link-uri Register si Login in meniu
+  - dupa autentificare afiseaza Logout si numele userului
+
+### 10) Frontend Register/Login - rulare si verificare
+
+```bash
+cd reactCRUD/frontend
+npm run typecheck
+npm run dev
+```
+
+Testeaza in browser:
+
+- http://localhost:5180/register
+- http://localhost:5180/login
+
+## Continuare - Backend Register si Login
+
+copiem angularCRUD/backend in reactCRUD/backend si 
+facem modificarile necesare pentru a avea un backend separat pentru React.
+
+### 11) Instalare dependinte backend
+
+```bash
+cd /backend
+npm install cors bcryptjs jsonwebtoken multer
+```
+
+### 12) Creare fisiere/foldere necesare backend
+
+```bash
+cd /backend
+touch users.json
+echo "[]" > users.json
+mkdir -p uploads/users
+```
+
+### 13) Scripturi recomandate in package.json (backend)
+
+Adauga scripturi:
+
+```json
+"scripts": {
+  "start": "node server.js",
+  "dev": "node --watch server.js"
+}
+```
+
+### 14) Implementare API auth in server.js (manual)
+
+Rute necesare:
+
+- POST /auth/register
+  - request de tip multipart/form-data
+  - campuri: name, surname, email, password, repeatPassword
+  - fisier: photo (input file)
+  - valideaza datele
+  - hash parola cu bcryptjs
+  - salveaza fisierul in uploads/users
+  - in users.json salveaza doar numele fisierului pentru photo
+  - returneaza JWT + date user (fara parola)
+
+- POST /auth/login
+  - primeste: email, password
+  - cauta userul in users.json
+  - verifica parola hash cu bcryptjs.compare
+  - returneaza JWT + date user
+
+- GET /auth/health
+  - endpoint simplu de verificare server
+
+Pe backend, expune static folderul uploads ca sa poti afisa poza din frontend.
+
+### 15) Pornire backend
+
+```bash
+cd angularCRUD/backend
+npm run dev
+```
+
+Backend auth ruleaza pe:
+
+- http://localhost:3000
+
+### 16) Test rapid endpoint-uri (optional)
+
+Register cu upload de fisier:
+
+```bash
+curl -X POST http://localhost:3000/auth/register \
+  -F "name=Ion" \
+  -F "surname=Popescu" \
+  -F "email=ion@example.com" \
+  -F "password=parola123" \
+  -F "repeatPassword=parola123" \
+  -F "photo=@/cale/catre/poza.jpg"
+```
+
+Login:
+
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email":"ion@example.com",
+    "password":"parola123"
+  }'
+```

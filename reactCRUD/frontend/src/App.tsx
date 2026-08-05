@@ -9,6 +9,7 @@ import ProductFormPage from "./pages/ProductFormPage";
 import Products from "./pages/Products";
 import Users from "./pages/Users";
 import UserFormPage from "./pages/UserFormPage";
+import VeziCos from "./pages/VeziCos";
 import { useAuth } from "./context/AuthContext";
 import "./App.css";
 import ProductsListPage from "./pages/ProductsListPage";
@@ -36,9 +37,14 @@ function App() {
         <main className="container py-4 app-main">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/productsList" element={<ProductsListPage />} />
+            <Route
+              path="/veziCos"
+              element={<VeziCos />}
+            />
+            <Route path="/products/:id" element={<ProductFormPage mode="view" />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/productsList" element={<ProductsListPage />} />
             <Route
               path="/adminProducts"
               element={
@@ -71,14 +77,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/products/:id"
-              element={
-                <ProtectedRoute>
-                  <ProductFormPage mode="view" />
-                </ProtectedRoute>
-              }
-            />
+          
             <Route
               path="/products/:id/edit"
               element={

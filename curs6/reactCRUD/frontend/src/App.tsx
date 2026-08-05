@@ -2,8 +2,10 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
 import ProductFormPage from "./pages/ProductFormPage";
 import ProductsListPage from "./pages/ProductsListPage";
+import RegisterPage from "./pages/RegisterPage";
 import "./App.css";
 
 function App() {
@@ -15,6 +17,8 @@ function App() {
         <main className="container py-4 app-main">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/products" element={<ProductsListPage />} />
             <Route
               path="/products/new"

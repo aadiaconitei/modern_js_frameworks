@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
+import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Rating from "../components/Rating";
 import {
@@ -25,6 +26,7 @@ interface ProductFormState {
 
 function ProductFormPage({ mode }: ProductFormPageProps) {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const { id } = useParams();
   const productId = id ? Number(id) : null;
 
@@ -270,8 +272,8 @@ function ProductFormPage({ mode }: ProductFormPageProps) {
                 </div>
               </div>
             ) : null}
-
-            {mode === "view" ? (
+ {isAuthenticated ? (
+            mode === "view" ? (
               <div className="col-12 d-flex justify-content-end gap-2">
                 <button
                   type="button"
@@ -295,7 +297,8 @@ function ProductFormPage({ mode }: ProductFormPageProps) {
                       : "Salveaza modificarile"}
                 </button>
               </div>
-            )}
+            )
+            ) : null}
           </form>
         )}
       </div>

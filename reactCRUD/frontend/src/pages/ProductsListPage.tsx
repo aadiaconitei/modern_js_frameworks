@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
-import {
-  deleteProduct,
-  getProducts,
-  Product,
-  ProductsResponse,
-} from "../services/productsApi";
+import { getProducts, Product, ProductsResponse } from "../services/productsApi";
 import { resolveImageUrl } from "../utils/images";
 import Rating from "../components/Rating";
+import { addToCart, getCartItems } from "../services/cartStorage";
 
 function ProductsListPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -18,13 +14,11 @@ function ProductsListPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [cartCount, setCartCount] = useState(() =>
+    getCartItems().reduce((sum, item) => sum + item.quantity, 0),
+  );
 
-  useEffect(() => {
-    loadProducts(page);
-  }, [page]);
-
-  async function loadProducts(targetPage: number): Promise<void> {
+  const loadProducts = useCallback(async (targetPage: number): Promise<void> => {
     setLoading(true);
     setError("");
 
@@ -42,7 +36,26 @@ function ProductsListPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [perPage]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadProducts(page);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [page, loadProducts]);
+
+  useEffect(() => {
+    const handler = () => {
+      setCartCount(getCartItems().reduce((sum, item) => sum + item.quantity, 0));
+    };
+
+    window.addEventListener("cart:updated", handler);
+    return () => window.removeEventListener("cart:updated", handler);
+  }, []);
 
   function previousPage() {
     if (page <= 0) {
@@ -60,29 +73,9 @@ function ProductsListPage() {
     setPage((prev) => prev + 1);
   }
 
-  async function handleDelete(product: Product): Promise<void> {
-    const shouldDelete = window.confirm(
-      `Sigur doresti sa stergi produsul "${product.name}"?`,
-    );
-    if (!shouldDelete) {
-      return;
-    }
-
-    setDeletingId(product.id);
-
-    try {
-      await deleteProduct(product.id);
-
-      if (products.length === 1 && page > 0) {
-        setPage((prev) => prev - 1);
-      } else {
-        await loadProducts(page);
-      }
-    } catch {
-      setError("Nu s-a putut sterge produsul.");
-    } finally {
-      setDeletingId(null);
-    }
+  function handleAddToCart(product: Product): void {
+    addToCart(product);
+    setCartCount((prev) => prev + 1);
   }
 
   return (
@@ -92,6 +85,7 @@ function ProductsListPage() {
           <h2 className="mb-0">Produse</h2>
           <small className="text-muted">Total: {total}</small>
         </div>
+        
         <Link className="btn btn-success" to="/products/new">
           Adauga produs
         </Link>
@@ -133,33 +127,28 @@ function ProductsListPage() {
                     </div>
 
                     <div className="mt-auto d-grid gap-2">
-                      <Link
-                        className="btn btn-outline-primary btn-sm"
-                        to={`/products/${product.id}`}
-                      >
-                        Vizualizare
-                      </Link>
-                      <Link
-                        className="btn btn-outline-warning btn-sm"
-                        to={`/products/${product.id}/edit`}
-                      >
-                        Editare
+                      <Link className="btn btn-info" to={`/products/${product.id}`}>
+                        Vezi produs
                       </Link>
                       <button
                         type="button"
-                        className="btn btn-outline-danger btn-sm"
-                        disabled={deletingId === product.id}
-                        onClick={() => handleDelete(product)}
+                        className="btn btn-primary btn-sm"
+                        onClick={() => handleAddToCart(product)}
                       >
-                        {deletingId === product.id
-                          ? "Se sterge..."
-                          : "Stergere"}
+                        Adauga in cos
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center mt-4">
+            <small className="text-muted">Produse in cos: {cartCount}</small>
+            <Link className="btn btn-outline-dark btn-sm" to="/veziCos">
+              Vezi cosul
+            </Link>
           </div>
 
           <div className="d-flex justify-content-center align-items-center gap-3 mt-4">

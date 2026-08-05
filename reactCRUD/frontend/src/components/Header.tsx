@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getCartCount, subscribeToCartChanges } from "../services/cartStorage";
+
 function resolveUserPhoto(photo: string): string {
   if (!photo) {
     return "";
@@ -11,8 +14,17 @@ function resolveUserPhoto(photo: string): string {
 
   return `http://localhost:3000${photo}`;
 }
+
 function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const [cartCount, setCartCount] = useState(() => getCartCount());
+
+  useEffect(() => {
+    return subscribeToCartChanges(() => {
+      setCartCount(getCartCount());
+    });
+  }, []);
+
   return (
     <header className="app-header shadow-sm">
       <nav className="navbar navbar-dark bg-primary py-3">
@@ -28,10 +40,20 @@ function Header() {
               </NavLink>
             </li>
             <li className="nav-item">
-                  <NavLink className="nav-link" to="/productsList">
-                    Produse
-                  </NavLink>
-                </li>
+              <NavLink className="nav-link position-relative" to="/veziCos">
+                Cos
+                {cartCount > 0 ? (
+                  <span className="badge bg-light text-primary ms-2">
+                    {cartCount}
+                  </span>
+                ) : null}
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/productsList">
+                Produse
+              </NavLink>
+            </li>
             {isAuthenticated ? (
               <>
                 <li className="nav-item">
