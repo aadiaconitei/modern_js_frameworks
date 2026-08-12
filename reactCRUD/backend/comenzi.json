@@ -56,5 +56,26 @@
     ],
     "totalPrice": 139,
     "createdAt": "2026-08-03T17:54:32.794Z"
+  },
+  {
+    "orderId": "ORD-1785941351953-34055",
+    "user": {
+      "id": 1784107990713,
+      "name": "Adrian222",
+      "surname": "Adiaconitei",
+      "email": "aadiaconitei@gmail.com"
+    },
+    "items": [
+      {
+        "id": 3,
+        "image": "assets/images/products/image3.jpg",
+        "name": "White  VUE",
+        "price": "85.0",
+        "rating": 5,
+        "quantity": 5
+      }
+    ],
+    "totalPrice": 425,
+    "createdAt": "2026-08-05T14:49:11.955Z"
   }
 ]

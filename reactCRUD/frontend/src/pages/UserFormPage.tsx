@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { getUserById, updateUser } from "../services/usersApi";
 
 interface UserFormState {
@@ -11,8 +12,10 @@ interface UserFormState {
 
 function UserFormPage() {
   const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const { id } = useParams();
-  const userId = id ? Number(id) : null;
+  const userId = id ? Number(id) : user?.id ?? null;
+  const isOwnProfileEdit = !id;
 
   const [form, setForm] = useState<UserFormState>({
     name: "",
@@ -94,7 +97,7 @@ function UserFormPage() {
         surname: form.surname.trim(),
         email: form.email.trim(),
       });
-      navigate("/users", { replace: true });
+      navigate(isAdmin && !isOwnProfileEdit ? "/users" : "/", { replace: true });
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
       const apiMessage = axiosError.response?.data?.message;
@@ -108,9 +111,16 @@ function UserFormPage() {
     <section className="card shadow-sm">
       <div className="card-body p-4">
         <div className="d-flex align-items-center justify-content-between mb-3">
-          <h2 className="mb-0">Editare utilizator</h2>
-          <Link className="btn btn-outline-secondary" to="/users">
-            Inapoi la utilizatori
+          <h2 className="mb-0">
+            {isOwnProfileEdit ? "Editare profil" : "Editare utilizator"}
+          </h2>
+          <Link
+            className="btn btn-outline-secondary"
+            to={isAdmin && !isOwnProfileEdit ? "/users" : "/"}
+          >
+            {isAdmin && !isOwnProfileEdit
+              ? "Inapoi la utilizatori"
+              : "Inapoi acasa"}
           </Link>
         </div>
 

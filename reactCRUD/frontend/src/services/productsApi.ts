@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_ENDPOINTS, API_TIMEOUT_MS } from "../config/api";
 import { getStoredToken } from "./authStorage";
 
 export interface Product {
@@ -25,8 +26,8 @@ export interface ProductsResponse {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/clothes",
-  timeout: 10000,
+  baseURL: API_ENDPOINTS.clothes,
+  timeout: API_TIMEOUT_MS,
 });
 
 api.interceptors.request.use((config) => {

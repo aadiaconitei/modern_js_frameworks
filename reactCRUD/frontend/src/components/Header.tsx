@@ -1,22 +1,11 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { resolveBackendAssetUrl } from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import { getCartCount, subscribeToCartChanges } from "../services/cartStorage";
 
-function resolveUserPhoto(photo: string): string {
-  if (!photo) {
-    return "";
-  }
-
-  if (photo.startsWith("http://") || photo.startsWith("https://")) {
-    return photo;
-  }
-
-  return `http://localhost:3000${photo}`;
-}
-
 function Header() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [cartCount, setCartCount] = useState(() => getCartCount());
 
   useEffect(() => {
@@ -55,21 +44,44 @@ function Header() {
               </NavLink>
             </li>
             {isAuthenticated ? (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/my-orders">
+                  Comenzile mele
+                </NavLink>
+              </li>
+            ) : null}
+            {isAuthenticated ? (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/my-profile/edit">
+                  Profilul meu
+                </NavLink>
+              </li>
+            ) : null}
+            {isAuthenticated ? (
               <>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/adminProducts">
-                    Admin Produse
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/users">
-                    Admin Utilizatori
-                  </NavLink>
-                </li>
+                {isAdmin ? (
+                  <>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/admin-orders">
+                        Comenzi admin
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/adminProducts">
+                        Admin Produse
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/users">
+                        Admin Utilizatori
+                      </NavLink>
+                    </li>
+                  </>
+                ) : null}
                 <li className="nav-item text-white d-flex align-items-center small px-2 gap-2">
                   {user?.photo ? (
                     <img
-                      src={resolveUserPhoto(user.photo)}
+                      src={resolveBackendAssetUrl(user.photo)}
                       alt="Avatar"
                       width={28}
                       height={28}

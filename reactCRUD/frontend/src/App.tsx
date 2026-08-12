@@ -13,8 +13,14 @@ import VeziCos from "./pages/VeziCos";
 import { useAuth } from "./context/AuthContext";
 import "./App.css";
 import ProductsListPage from "./pages/ProductsListPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import AdminOrdersPage from "./pages/AdminOrdersPage";
 
 interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+interface AdminRouteProps {
   children: ReactNode;
 }
 
@@ -23,6 +29,20 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AdminRoute({ children }: AdminRouteProps) {
+  const { isAuthenticated, isAdmin } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -48,21 +68,45 @@ function App() {
             <Route
               path="/adminProducts"
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <Products />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/my-orders"
+              element={
+                <ProtectedRoute>
+                  <MyOrdersPage />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-orders"
+              element={
+                <AdminRoute>
+                  <AdminOrdersPage />
+                </AdminRoute>
               }
             />
             <Route
               path="/users"
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <Users />
-                </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route
               path="/users/:id/edit"
+              element={
+                <AdminRoute>
+                  <UserFormPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/my-profile/edit"
               element={
                 <ProtectedRoute>
                   <UserFormPage />
@@ -72,18 +116,18 @@ function App() {
             <Route
               path="/products/new"
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <ProductFormPage mode="create" />
-                </ProtectedRoute>
+                </AdminRoute>
               }
             />
           
             <Route
               path="/products/:id/edit"
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <ProductFormPage mode="edit" />
-                </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route path="*" element={<Navigate to="/" replace />} />

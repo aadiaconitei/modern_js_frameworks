@@ -26,7 +26,7 @@ interface ProductFormState {
 
 function ProductFormPage({ mode }: ProductFormPageProps) {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { isAdmin } = useAuth();
   const { id } = useParams();
   const productId = id ? Number(id) : null;
 
@@ -272,32 +272,32 @@ function ProductFormPage({ mode }: ProductFormPageProps) {
                 </div>
               </div>
             ) : null}
- {isAuthenticated ? (
-            mode === "view" ? (
-              <div className="col-12 d-flex justify-content-end gap-2">
-                <button
-                  type="button"
-                  className="btn btn-warning"
-                  onClick={handleEnableEditMode}
-                >
-                  Editare
-                </button>
-              </div>
-            ) : (
-              <div className="col-12 d-flex justify-content-end gap-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={submitting}
-                >
-                  {submitting
-                    ? "Se salveaza..."
-                    : mode === "create"
-                      ? "Creeaza produs"
-                      : "Salveaza modificarile"}
-                </button>
-              </div>
-            )
+            {isAdmin ? (
+              mode === "view" ? (
+                <div className="col-12 d-flex justify-content-end gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-warning"
+                    onClick={handleEnableEditMode}
+                  >
+                    Editare
+                  </button>
+                </div>
+              ) : (
+                <div className="col-12 d-flex justify-content-end gap-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={submitting}
+                  >
+                    {submitting
+                      ? "Se salveaza..."
+                      : mode === "create"
+                        ? "Creeaza produs"
+                        : "Salveaza modificarile"}
+                  </button>
+                </div>
+              )
             ) : null}
           </form>
         )}

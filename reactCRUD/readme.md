@@ -347,3 +347,128 @@ Comportament asteptat:
 - dupa login: apar in meniu `Produse` si `Utilizatori`, iar paginile devin accesibile
 
 
+
+# Pregătirea contului Render
+
+Pentru publicarea backend-ului, fiecare student trebuie să:
+
+1. **Își creeze un cont Render**
+2. **Conecteze contul GitHub** cu Render
+3. **Selecteze repository-ul** care conține backend-ul
+4. **Configureze serviciul Web Service**
+5. **Configureze variabilele de mediu**
+6. **Configureze comenzile de Build și Start**
+7. **Realizeze primul Deploy**
+8. **Verifice logurile și funcționarea API-ului**
+
+### Configurație exemplu
+
+```text
+Repository: backend
+Runtime: Node
+Build Command:
+npm install
+
+Start Command:
+npm start
+```
+
+Variabilele sensibile, precum:
+
+```text
+DATABASE_URL
+JWT_SECRET
+API_KEY
+```
+
+sunt configurate în **Environment Variables**, nu sunt introduse în codul sursă.
+
+### Rezultatul
+
+```text
+GitHub
+   │
+   ▼
+Render
+   │
+   ├── Build
+   ├── Deploy
+   └── Run Node.js
+          │
+          ▼
+       REST API
+```
+# Publicarea Frontend-ului — GitHub Pages
+
+Pentru publicarea aplicației React, fiecare student trebuie să:
+
+1. **Își creeze un cont GitHub**
+2. **Creeze un repository** pentru proiectul frontend
+3. **Încarce proiectul React + TypeScript**
+4. **Configureze build-ul pentru producție**
+5. **Activeze GitHub Pages**
+6. **Configureze procesul de deploy**
+7. **Acceseze aplicația prin URL-ul generat de GitHub Pages**
+
+### Fluxul de publicare
+
+```text
+React + TypeScript
+        │
+        ▼
+   npm run build
+        │
+        ▼
+      dist/
+        │
+        ▼
+   GitHub Pages
+        │
+        ▼
+  Aplicație LIVE
+```
+
+### În dezvoltare
+
+```text
+src/
+├── components/
+├── pages/
+├── services/
+└── ...
+
+TypeScript + React
+```
+
+### În producție
+
+Browserul primește build-ul generat:
+
+```text
+dist/
+├── index.html
+└── assets/
+    ├── *.js
+    └── *.css
+```
+
+**Codul sursă TypeScript nu este executat direct în browser. Acesta este transformat în JavaScript în etapa de build.**
+
+### Rezultatul
+
+```text
+GitHub Repository
+       │
+       ▼
+ GitHub Actions
+       │
+       ▼
+ npm run build
+       │
+       ▼
+ GitHub Pages
+       │
+       ▼
+ Frontend LIVE
+```
+

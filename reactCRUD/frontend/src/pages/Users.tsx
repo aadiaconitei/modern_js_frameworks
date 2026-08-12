@@ -1,19 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
+import { resolveBackendAssetUrl } from "../config/api";
 import { deleteUser, getUsers, UserItem } from "../services/usersApi";
-
-function resolveUserPhoto(photo: string): string {
-  if (!photo) {
-    return "";
-  }
-
-  if (photo.startsWith("http://") || photo.startsWith("https://")) {
-    return photo;
-  }
-
-  return `http://localhost:3000${photo}`;
-}
+import { useAuth } from "../context/AuthContext";
 
 function formatDate(dateValue: string): string {
   if (!dateValue) {
@@ -33,6 +23,7 @@ function formatDate(dateValue: string): string {
 }
 
 function Users() {
+  const { isAdmin } = useAuth();
   const [users, setUsers] = useState<UserItem[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState("");
@@ -112,7 +103,7 @@ function Users() {
               <div className="card h-100 shadow-sm">
                 {user.photo ? (
                   <img
-                    src={resolveUserPhoto(user.photo)}
+                    src={resolveBackendAssetUrl(user.photo)}
                     alt={`${user.name} ${user.surname}`}
                     className="card-img-top product-image"
                     style={{ objectFit: "cover" }}
@@ -129,20 +120,24 @@ function Users() {
                   </p>
 
                   <div className="mt-auto d-grid gap-2 pt-3">
-                    <Link
-                      className="btn btn-outline-warning btn-sm"
-                      to={`/users/${user.id}/edit`}
-                    >
-                      Editare
-                    </Link>
-                    <button
-                      type="button"
-                      className="btn btn-outline-danger btn-sm"
-                      disabled={deletingUserId === user.id}
-                      onClick={() => handleDeleteUser(user)}
-                    >
-                      {deletingUserId === user.id ? "Se sterge..." : "Stergere"}
-                    </button>
+                    {isAdmin ? (
+                      <>
+                        <Link
+                          className="btn btn-outline-warning btn-sm"
+                          to={`/users/${user.id}/edit`}
+                        >
+                          Editare
+                        </Link>
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger btn-sm"
+                          disabled={deletingUserId === user.id}
+                          onClick={() => handleDeleteUser(user)}
+                        >
+                          {deletingUserId === user.id ? "Se sterge..." : "Stergere"}
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                 </div>
               </div>

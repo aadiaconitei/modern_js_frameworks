@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_ENDPOINTS, API_TIMEOUT_MS } from "../config/api";
 import { getStoredToken } from "./authStorage";
 
 export interface UserItem {
@@ -6,6 +7,7 @@ export interface UserItem {
   name: string;
   surname: string;
   email: string;
+  role: string;
   photo: string;
   createdAt: string;
 }
@@ -17,8 +19,8 @@ export interface UserUpdatePayload {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/users",
-  timeout: 10000,
+  baseURL: API_ENDPOINTS.users,
+  timeout: API_TIMEOUT_MS,
 });
 
 api.interceptors.request.use((config) => {

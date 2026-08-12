@@ -17,6 +17,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   token: string;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (token: string, user: AuthUser) => void;
   logout: () => void;
 }
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       user,
       token,
       isAuthenticated: Boolean(token),
+      isAdmin: user?.role === "admin",
       login: handleLogin,
       logout: handleLogout,
     }),

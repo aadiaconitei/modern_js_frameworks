@@ -1,10 +1,12 @@
 import axios, { AxiosError } from "axios";
+import { API_ENDPOINTS, API_TIMEOUT_MS } from "../config/api";
 
 export interface AuthUser {
   id: number;
   name: string;
   surname: string;
   email: string;
+  role: string;
   photo: string;
   createdAt: string;
 }
@@ -30,8 +32,8 @@ export interface LoginPayload {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/auth",
-  timeout: 10000,
+  baseURL: API_ENDPOINTS.auth,
+  timeout: API_TIMEOUT_MS,
 });
 
 function mapError(err: unknown, fallback: string): string {

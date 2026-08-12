@@ -5,8 +5,10 @@ import { getProducts, Product, ProductsResponse } from "../services/productsApi"
 import { resolveImageUrl } from "../utils/images";
 import Rating from "../components/Rating";
 import { addToCart, getCartItems } from "../services/cartStorage";
+import { useAuth } from "../context/AuthContext";
 
 function ProductsListPage() {
+  const { isAdmin } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(0);
   const [perPage] = useState(4);
@@ -86,9 +88,11 @@ function ProductsListPage() {
           <small className="text-muted">Total: {total}</small>
         </div>
         
-        <Link className="btn btn-success" to="/products/new">
-          Adauga produs
-        </Link>
+        {isAdmin ? (
+          <Link className="btn btn-success" to="/products/new">
+            Adauga produs
+          </Link>
+        ) : null}
       </section>
 
       {error ? (
