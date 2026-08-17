@@ -50,7 +50,7 @@ function AdminRoute({ children }: AdminRouteProps) {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/proiect_frontend">
       <div className="app-shell">
         <Header />
 

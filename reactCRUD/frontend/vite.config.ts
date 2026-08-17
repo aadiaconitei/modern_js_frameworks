@@ -7,4 +7,5 @@ export default defineConfig({
   server: {
     port: 5180,
   },
+  base: "/proiect_frontend/",
 });
